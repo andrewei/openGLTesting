@@ -45,7 +45,7 @@ int main(void) {
 	std::vector<Drawable> drawables;
 	for(int i = 0; i < 10; i++){
 		for(int j = 0; j < 10; j++){
-			for(int k = 0; k < 10; k++){				
+			for(int k = 0; k < 10; k++){
 				drawables.emplace_back(programID, g_vertex_buffer_data ,g_color_buffer_data, glm::vec3(-50 + i * 10.0f, -50 + j * 10.0f, -50 + k * 10.0f));
 			}
 		}
@@ -54,7 +54,10 @@ int main(void) {
 	float scale_var = 1;
 	int sin_var = 0;
 	mat4 scale_matrix;
+
+
 	do {
+
 		sin_var +=1;
 		computeMatricesFromInputs();
 
@@ -68,17 +71,17 @@ int main(void) {
 		vec3 rotation_model( 1.0f, 0.0f, 0.0f);
 		for (int i=0; i < drawables.size(); i++) {
 			mat4 model_transform = rotate(float(xpos * 0.0001f), rotation_model);
-			drawables[i].Model = drawables[i].Model * model_transform;
+			//drawables[i].Model = drawables[i].Model * model_transform;
 		}
 
 		//Rotate view
 		vec3 rotation_view(0.0f, 1.0f, 0.0f);
 		mat4 view_transform = rotate(sin (static_cast<float>(sin_var*3.14/180))*0.02f - 0.025f, rotation_view);
-		//View = View * view_transform;
+		View = View * view_transform;
 
 		//scale
-		//mat4 scale_matrix = scale(vec3(static_cast<float>(sin(sin_var*3.14/180)+2.0f), static_cast<float>(sin(sin_var*3.14/180)+2.0f), static_cast<float>(sin(sin_var*3.14/180)+2.0f)));
-		scale_matrix = scale(vec3(scale_var, scale_var, scale_var));
+		mat4 scale_matrix = scale(vec3(static_cast<float>(sin(sin_var*3.14/180)+2.0f), static_cast<float>(sin(sin_var*3.14/180)+2.0f), static_cast<float>(sin(sin_var*3.14/180)+2.0f)));
+		//scale_matrix = scale(vec3(scale_var, scale_var, scale_var));
 		//Setting box position
 		for (int i=0; i < drawables.size(); i++) {
 			drawables[i].mvp = getProjectionMatrix() * getViewMatrix() * scale_matrix * drawables[i].Model;
@@ -89,11 +92,12 @@ int main(void) {
 
 		//draw background
 		//glClearColor(static_cast<float>(cos(sin_var/350)*0.58f), static_cast<float>(tan(sin_var/350)*0.58f), static_cast<float>(sin(sin_var/350)*0.58f), 0.0f);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.2f, 0.2f, 0.0f, 0.0f);
 
 		for (int i=0; i < drawables.size(); i++) {
 			glUniformMatrix4fv(drawables[i].MatrixID, 1, GL_FALSE, &drawables[i].mvp[0][0]);
 			glBindVertexArray(drawables[i].VertexArrayID);
+
 			glDrawArrays(GL_TRIANGLES, 0, drawables[i].size_data * 3);
 		}
 
@@ -101,8 +105,6 @@ int main(void) {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		// Reset mouse position for next frame
-		//glfwSetCursorPos(window, 1024/2, 768/2);
 	}
 	while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		  glfwWindowShouldClose(window) == 0);
@@ -161,6 +163,8 @@ int opengl_init() {
 	glDepthFunc(GL_LESS);
 	// Use our shader
 	glUseProgram(programID);
+	//enable 2d textures
+	glEnable(GL_TEXTURE_2D);
 	return programID;
 }
 
