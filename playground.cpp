@@ -25,6 +25,8 @@
 #include "data.hpp"
 #include "drawable.hpp"
 
+#include "controls.hpp"
+
 using namespace glm;
 
 GLFWwindow* window;
@@ -43,38 +45,18 @@ int main(void) {
 	std::vector<Drawable> drawables;
 	for(int i = 0; i < 10; i++){
 		for(int j = 0; j < 10; j++){
-			for(int k = 0; k < 10; k++){
-				drawables.emplace_back(programID, g_vertex_buffer_data ,g_color_buffer_data, glm::vec3(0.0f, 0.0f ,0.0f));
+			for(int k = 0; k < 10; k++){				
 				drawables.emplace_back(programID, g_vertex_buffer_data ,g_color_buffer_data, glm::vec3(-50 + i * 10.0f, -50 + j * 10.0f, -50 + k * 10.0f));
-				//drawables.emplace_back(programID, g_vertex_buffer_data_triangle ,g_color_buffer_data_triangle, glm::vec3(-50 + i * 10.0f, -50 + j * 10.0f, -50 + k * 10.0f));
 			}
 		}
 	}
 
-	float scale_var = 0;
+	float scale_var = 1;
 	int sin_var = 0;
 	mat4 scale_matrix;
 	do {
 		sin_var +=1;
-
-		// Move forward
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
-			scale_var *= 1.01;
-		}
-		// Move backward
-		else if (glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS){
-			scale_var *= 0.99;
-		}
-		else {
-			if(scale_var > 1.2){
-				scale_var -= 0.1;
-			}
-			else if (scale_var < 0.8){
-				scale_var += 0.002;
-			}
-		}
-
-
+		computeMatricesFromInputs();
 
 		// Get mouse position
 		double xpos, ypos;
@@ -99,7 +81,7 @@ int main(void) {
 		scale_matrix = scale(vec3(scale_var, scale_var, scale_var));
 		//Setting box position
 		for (int i=0; i < drawables.size(); i++) {
-			drawables[i].mvp = Projection * View * scale_matrix * drawables[i].Model;
+			drawables[i].mvp = getProjectionMatrix() * getViewMatrix() * scale_matrix * drawables[i].Model;
 		}
 
 		//Clear screen
@@ -130,7 +112,6 @@ int main(void) {
 
 	return 0;
 }
-
 
 int opengl_init() {
 	// Initialise GLFW
