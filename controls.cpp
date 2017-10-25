@@ -1,5 +1,6 @@
 // Include GLFW
 #include <glfw3.h>
+#include <iostream>
 extern GLFWwindow* window; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
 
 // Include GLM
@@ -21,7 +22,7 @@ glm::mat4 getProjectionMatrix(){
 
 
 // Initial position : on +Z
-glm::vec3 position = glm::vec3( 0, 35, 0 );
+glm::vec3 position = glm::vec3( 0, 0, 10.0f );
 // Initial horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
 // Initial vertical angle : none
@@ -51,9 +52,12 @@ void computeMatricesFromInputs(){
 	glfwSetCursorPos(window, 1024/2, 768/2);
 
 	// Compute new orientation
-	horizontalAngle += mouseSpeed * float(1024/2 - xpos );
-	verticalAngle   -= mouseSpeed * float( 768/2 - ypos );
+	if((glm::length(glm::vec2(1024/2 - xpos, 768/2 - ypos))) < 512) {
+		horizontalAngle -= mouseSpeed * float(1024/2 - xpos );
+		verticalAngle   -= mouseSpeed * float( 768/2 - ypos );
+	}
 
+	std::cout << horizontalAngle << " " << verticalAngle << '\n';
 	// Direction : Spherical coordinates to Cartesian coordinates conversion
 	glm::vec3 direction(
 		cos(verticalAngle) * sin(horizontalAngle), 

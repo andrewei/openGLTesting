@@ -37,6 +37,7 @@ GLuint loadBMP_custom(const char * imagepath){
 	data = new unsigned char [imageSize];
 
 	// Read the actual data from the file into the buffer
+	fseek(file, dataPos, SEEK_SET);
 	fread(data,1,imageSize,file);
 
 	//Everything is in memory now, the file can be closed
